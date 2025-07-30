@@ -1,29 +1,13 @@
 import { GoogleMapsOverlay } from '@deck.gl/google-maps';
 import { HexagonLayer } from '@deck.gl/aggregation-layers';
 
-async function loadGoogleMapsAPI(apiKey) {
-  return new Promise(resolve => {
-    const url = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&callback=initMap&loading=async`;
-    const script = document.createElement('script');
-    script.src = url;
-    script.defer = true;
-    script.async = true;
-    window.initMap = resolve;
-    document.head.appendChild(script);
-  });
-}
+const googleMapsAPIKey = process.env.GOOGLE_MAPS_API_KEY;
 
-async function runApp() {
-  await loadGoogleMapsAPI(process.env.GOOGLE_MAPS_API_KEY);
+loadJSAPI();
 
-  const map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 25.07108, lng: 121.5598 },
-    mapId: process.env.MAP_ID,
-    tilt: 45,
-    zoom: 13,
-  });
-
-  const hexagonLayer = new HexagonLayer({
+function runApp() {
+  const map = initMap();
+  const layerOptions = {
     id: 'hexagon-layer',
     data: './stations.json',
     gpuAggregation: true,
@@ -43,22 +27,41 @@ async function runApp() {
     radius: 150,
     pickable: true,
     autoHighlight: true,
-  });
-
+  };
+  const hexagonLayer = new HexagonLayer(layerOptions);
   const googleMapsOverlay = new GoogleMapsOverlay({
+    controller: true,
+    getTooltip: ({object}) => {
+      if (!object || !object.points || object.points.length === 0) return null;
+      const name = object.points[0].source.name;
+      const address = object.points[0].source.address;
+      return `場所名稱：${name} \n 場所地址：${address} \n 飲水台數：${object.elevationValue}`;
+    },
     layers: [hexagonLayer]
   });
   googleMapsOverlay.setMap(map);
-
-  // map.addListener('idle', () => {
-  //   googleMapsOverlay.setProps({ layers: [hexagonLayer] });
-  // });
-
-  function setMap(center, zoom) {
-    map.setCenter(center);
-    map.setZoom(zoom);
-    googleMapsOverlay.setProps({ layers: [hexagonLayer] });
-  }
 }
 
-runApp();
+function loadJSAPI() {
+  const googleMapsAPIURI = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}&callback=runApp&loading=async`;
+  const script = document.createElement('script');
+
+  script.src = googleMapsAPIURI;
+  script.defer = true;
+  script.async = true;
+
+  window.runApp = runApp;
+  document.head.appendChild(script);
+}
+
+function initMap() {
+  const mapOptions = {
+    center: { lat: 25.07108, lng: 121.5598 },
+    mapId: process.env.MAP_ID,
+    tilt: 45,
+    zoom: 13,
+  };
+
+  const mapDiv = document.getElementById('map');
+  return new google.maps.Map(mapDiv, mapOptions);
+}
