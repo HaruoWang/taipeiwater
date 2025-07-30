@@ -10,7 +10,6 @@ function runApp() {
   const layerOptions = {
     id: 'hexagon-layer',
     data: './stations.json',
-    gpuAggregation: true,
     extruded: true,
     colorRange: [
       [239, 243, 255],
