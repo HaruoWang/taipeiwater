@@ -20,7 +20,9 @@ function runApp() {
       [49, 130, 189],
       [8, 81, 156]
     ],
-    getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
+    updateTriggers: {
+      getPosition: [map.getZoom(), map.getCenter().lat(), map.getCenter().lng()]
+    },
     getColorWeight: d => parseInt(d.capacity),
     getElevationWeight: d => parseInt(d.capacity),
     elevationScale: 4,
@@ -40,8 +42,10 @@ function runApp() {
   });
   googleMapsOverlay.setMap(map);
 
-  map.addListener('idle', () => {
-    googleMapsOverlay.setProps({ layers: [hexagonLayer] });
+  map.addListener('zoom_changed', () => {
+    window.requestAnimationFrame(() => {
+      googleMapsOverlay.setProps({ layers: [hexagonLayer] });
+    });
   });
 }
 
