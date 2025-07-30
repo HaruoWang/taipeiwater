@@ -10,6 +10,7 @@ function runApp() {
   const layerOptions = {
     id: 'hexagon-layer',
     data: './stations.json',
+    gpuAggregation: true,
     extruded: true,
     colorRange: [
       [239, 243, 255],
@@ -35,10 +36,13 @@ function runApp() {
       const name = object.points[0].source.name;
       const address = object.points[0].source.address;
       return `場所名稱：${name} \n 場所地址：${address} \n 飲水台數：${object.elevationValue}`;
-    },
-    layers: [hexagonLayer]
+    }
   });
   googleMapsOverlay.setMap(map);
+
+  map.addListener('idle', () => {
+    googleMapsOverlay.setProps({ layers: [hexagonLayer] });
+  });
 }
 
 function loadJSAPI() {
