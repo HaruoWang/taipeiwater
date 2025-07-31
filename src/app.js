@@ -5,13 +5,26 @@ const googleMapsAPIKey = process.env.GOOGLE_MAPS_API_KEY;
 
 loadJSAPI();
 
+window.matchMedia("(orientation: portrait)").addEventListener("change", () => {
+  location.reload(); // 或重新執行 runApp()
+});
+
 function runApp() {
-  const map = initMap();
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  const mapOptions = {
+    center: { lat: 25.07108, lng: 121.5598 },
+    mapId: process.env.MAP_ID,
+    tilt: isPortrait ? 0 : 45, // portrait 時不傾斜
+    zoom: 13,
+  };
+  const mapDiv = document.getElementById('map');
+  const map = new google.maps.Map(mapDiv, mapOptions);
   const layerOptions = {
     id: 'hexagon-layer',
     data: './stations.json',
     gpuAggregation: true,
-    extruded: true,
+    extruded: !isPortrait, // portrait 時不立體
+    elevationScale: isPortrait ? 0 : 4, // portrait 時不抬升
     colorRange: [
       [239, 243, 255],
       [198, 219, 239],
@@ -23,7 +36,6 @@ function runApp() {
     getPosition: d => [parseFloat(d.longitude), parseFloat(d.latitude)],
     getColorWeight: d => parseInt(d.capacity),
     getElevationWeight: d => parseInt(d.capacity),
-    elevationScale: 4,
     radius: 150,
     pickable: true,
     autoHighlight: true,
@@ -54,14 +66,14 @@ function loadJSAPI() {
   document.head.appendChild(script);
 }
 
-function initMap() {
-  const mapOptions = {
-    center: { lat: 25.07108, lng: 121.5598 },
-    mapId: process.env.MAP_ID,
-    tilt: 45,
-    zoom: 13,
-  };
+// function initMap() {
+//   const mapOptions = {
+//     center: { lat: 25.07108, lng: 121.5598 },
+//     mapId: process.env.MAP_ID,
+//     tilt: 45,
+//     zoom: 13,
+//   };
 
-  const mapDiv = document.getElementById('map');
-  return new google.maps.Map(mapDiv, mapOptions);
-}
+//   const mapDiv = document.getElementById('map');
+//   return new google.maps.Map(mapDiv, mapOptions);
+// }
