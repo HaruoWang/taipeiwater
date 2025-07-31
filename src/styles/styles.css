@@ -1,13 +1,13 @@
 html,
 body {
-    height: 100%;
     border: 0px;
     margin: 0px;
     padding: 0px;
     font-family: sans-serif;
 }
 #map {
-    height: 100%;
+    width: 100dvw;
+    height: 100dvh;
 }
 #tooltip {
     pointer-events: none;
@@ -19,7 +19,7 @@ body {
     background: #000;
     color: #fff;
 }
-/* #orientation-tip {
+#orientation-tip {
     width: 100dvw;
     height: 100dvh;
     place-content: center;
@@ -55,4 +55,4 @@ body {
   #orientation-tip {
     display: none;
   }
-} */
+}
