@@ -20,7 +20,7 @@ body {
     background: #000;
     color: #fff;
 }
-/* #orientation-tip {
+#orientation-tip {
     width: 100dvw;
     height: 100dvh;
     place-content: center;
@@ -56,4 +56,4 @@ body {
   #orientation-tip {
     display: none;
   }
-} */
+}
